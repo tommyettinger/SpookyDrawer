@@ -1,42 +1,103 @@
-# Library Template using libGDX and Gradle 9.x
+# Shape Drawer
 
-Change this to fit your library!
+[![](https://jitpack.io/v/earlygrey/shapedrawer.svg)](https://jitpack.io/#space.earlygrey/shapedrawer)
 
-Normally you use this repo by forking it, making any changes to match future projects you will want to make,
-and then using this repo as a template when you make a new project. This often involves changing the packages
-from `com.github.tommyettinger` to your own reverse domain name or to use your own GitHub username.
+---
 
-You'll want to edit gradle.properties to match your library's name, description, author, license, and so on.
-You probably also want to edit build.gradle to match the projectName and group to what you want to use.
+A library for [libGDX](https://github.com/libgdx/libgdx), an open-source game development application framework written in java.
 
-You should "Find in Files" and search for any places that use the word "template" in order to find anything
-you will want to replace. The search should be case-insensitive.
+Draws simple shapes like libGDX's
+[ShapeRenderer](https://javadoc.io/static/com.badlogicgames.gdx/gdx/1.11.0/com/badlogic/gdx/graphics/glutils/ShapeRenderer.html)
+does, but uses a Batch to perform the drawing. This means it can be used in between `Batch#begin()` and `Batch#end()`
+without needing to flush the Batch.
 
-This includes some extra configuration so that you can deploy more easily to [JitPack](https://jitpack.io). If you're
-testing a specific commit and don't want to push a release to GitHub or Maven Central just to test (especially
-if testing by seeing if a user can build with your library), then JitPack is a great option. It can also be an
-excellent way of making GitHub releases available via Maven or Gradle dependencies. The `jitpack.yml` file this
-includes defaults to Java 21; you can potentially raise this as high as 27, though that might cause problems
-with Kotlin or libraries like Kryo, or as low as 11 (the minimum for the publishing plugin this uses). JDK 21
-may warn if you target Java 8, though this is only a warning. It has better generated Javadocs than earlier
-versions, though, so using 21 seems good.
+Comes with overloaded methods to draw lines, paths, ellipses, regular polygons and rectangles.
 
-You might also want to target JitPack because Maven Central restricts how many releases, how many files, and their
-total file size you can publish in a month, and the limits are quite low. JitPack, in my experience, will only refuse
-to build a release if it's queried many times in a short span of time, and even that is a temporary delay.
+Just needs to be provided with a Batch and a TextureRegion. However, note that if you want to draw filled shapes, it is
+more efficient to use a batch that implements [PolygonBatch](https://javadoc.io/static/com.badlogicgames.gdx/gdx/1.11.0/com/badlogic/gdx/graphics/g2d/PolygonBatch.html) (eg a [PolygonSpriteBatch](https://javadoc.io/static/com.badlogicgames.gdx/gdx/1.11.0/com/badlogic/gdx/graphics/g2d/PolygonSpriteBatch.html)) instead of a Batch
+that does not (eg a [SpriteBatch](https://javadoc.io/static/com.badlogicgames.gdx/gdx/1.11.0/com/badlogic/gdx/graphics/g2d/SpriteBatch.html)).
 
-Regardless of which JDK version JitPack uses to build, the default sourceCompatibility, targetCompatibility, and
-release are set to JDK 8, which supports many of the most convenient recent Java features, but not all. You can
-increase those to a higher version to get features like `var`, records, pattern matching, etc. but that typically
-will limit your library to being used by desktop builds (LWJGL 2 or 3, server, or headless). Using the language
-level of Java 8 is generally safe, but specific APIs added in Java 8 generally aren't available in RoboVM, GWT,
-or some versions of Android. You can go up to compatibility with 11 to get access to `var`, but then you lose
-all compatibility with RoboVM.
+![Gif didn't load - see wiki for images!](https://raw.githubusercontent.com/wiki/earlygrey/shapedrawer/images/readme_demo.gif)
 
-The test code, which goes in `src/test/java/`, uses compatibility with Java 8 by default, so you can use LWJGL3
-in tests out-of-the-box.
+---
 
-This currently uses Gradle 9.x; if you want an earlier version that uses 8.x,
-[here you go for 8](https://github.com/tommyettinger/libgdx-library-template/releases/tag/v8.14.3)!
-If you still want the much-earlier version that uses Gradle 7,
-[here you go for 7](https://github.com/tommyettinger/libgdx-library-template/releases/tag/v7.6)!
+## Including in Project
+
+To use this in your gradle project, add the version number and jitpack repository information to your root build.gradle file:
+ 
+```groovy
+allprojects {
+    ext {
+    	...
+        shapedrawerVersion = '2.5.0'
+    }
+    repositories {
+	...
+	maven { url 'https://jitpack.io' }
+    }
+}
+```
+And  in your core project add the dependency:
+```groovy
+dependencies {
+    implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
+}
+```
+
+For HTML5/GWT support, add the dependency to the html project:
+
+```groovy
+project(":html") {
+    apply plugin: "gwt"
+    apply plugin: "war"
+
+
+    dependencies {
+        ...
+        implementation "space.earlygrey:shapedrawer:$shapedrawerVersion:sources"
+    }
+}
+```
+
+And add the following line to the GdxDefinition.gwt.xml file in the HTML project:
+```xml
+<inherits name="space.earlygrey.shapedrawer"/>
+```
+
+See the [jitpack website](https://jitpack.io/#space.earlygrey/shapedrawer) for more info.
+
+Alternatively, if you're using [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff) to create your project you can find shape drawer under the "third-party" tab.
+
+
+## Usage
+
+To create a ShapeDrawer instance you just need a Batch and a TextureRegion. Typically this is a single white pixel so that you can easily colour it, and is best packed into an atlas with your other textures.
+
+To instantiate a ShapeDrawer, use:
+
+```java
+ShapeDrawer drawer = new ShapeDrawer(batch, region);
+```
+
+And to use it, simply call its drawing methods in between `Batch#begin()` and `Batch#end()`. Something like this:
+
+```java
+batch.begin();
+drawer.line(0, 0, 100, 100);
+batch.end();
+```
+
+That's it!
+
+---
+
+Check the [wiki](https://github.com/earlygrey/shapedrawer/wiki) for more info, including:
+* [Using Shape Drawer](https://github.com/earlygrey/shapedrawer/wiki/Using-Shape-Drawer)
+* [Shapes](https://github.com/earlygrey/shapedrawer/wiki/Shapes)
+* [Join Types](https://github.com/earlygrey/shapedrawer/wiki/Join-Types)
+* [Pixel Snapping](https://github.com/earlygrey/shapedrawer/wiki/Pixel-Snapping)
+
+
+---
+
+Test application uses the [Commodore 64 UI Skin](https://ray3k.wordpress.com/artwork/commodore-64-ui-skin-for-libgdx/) created by Raymond "Raeleus" Buckley under the [CC BY license](https://creativecommons.org/licenses/by/4.0/). [Check out the others!](https://ray3k.wordpress.com/artwork/)

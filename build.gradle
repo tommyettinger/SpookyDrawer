@@ -13,12 +13,9 @@ buildscript {
 apply plugin: 'java-library'
 apply plugin: 'com.vanniktech.maven.publish'
 
-//Obviously, change the next line to match your project name.
-def projectName = 'libgdx-library-template'
+def projectName = 'shapedrawer'
 
-//Change this to whatever Maven Central group you might publish to,
-//which is probably not this one if you aren't Tommy Ettinger.
-group = 'com.github.tommyettinger'
+group = 'io.github.0xDE57'
 
 version = "$VERSION_NAME" // You can set the version in gradle.properties .
 
@@ -37,7 +34,7 @@ plainJavadocJar.archiveBaseName.set(projectName)
 // There's pretty much no reason to use any encoding other than UTF-8 .
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
-// Disable JDK 8's doclint
+// Disable JDK 8's doclint.
 // http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html
 if (JavaVersion.current().isJava8Compatible()) {
     allprojects {
